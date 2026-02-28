@@ -2,4 +2,4 @@
 ## Includes code organized into argocd, helm charts, terraform, & AWS Regions
 ###
 
-Example code for my stuff where i write stuff, here is more stuff https://im-your-huckleberry.com/
+Take a peak at stuff in here & see what you think as i mess w/various DevSecOps tooling.
