@@ -8,3 +8,14 @@ variable "service_accounts" {
 variable "cluster_name" {
   type = string
 }
+variable "regions" {
+  type = map(string)
+  default = {
+    "east" = "us-east-1"
+    "west" = "us-west-2"
+  }
+}
+variable "cluster_version" {
+  type    = string
+  default = "1.30"
+}
