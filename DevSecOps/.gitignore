@@ -1,12 +1,53 @@
-# Local .terraform directories
-**/.terraform/*
-
-# .tfstate files
+# -----------------------------
+# Terraform
+# -----------------------------
 *.tfstate
 *.tfstate.*
+.terraform/
+.terraform.lock.hcl
 
-# Ignore any .tfvars files that are generated automatically for each Terraform run. Most
-# .tfvars files are managed as part of configuration and so should be included in
-# version control.
+# Local variable files (never commit secrets)
 *.tfvars
+*.tfvars.json
 *state.config
+
+# Crash logs
+crash.log
+
+# -----------------------------
+# Kubernetes / kubeconfig
+# -----------------------------
+*.kubeconfig
+kubeconfig
+kubeconfig-*
+
+# -----------------------------
+# Helm
+# -----------------------------
+# Helm cache and local chart builds
+charts/
+*.tgz
+
+# -----------------------------
+# OS / Editor junk
+# -----------------------------
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+.history/
+
+# JetBrains
+.idea/
+
+# -----------------------------
+# Logs
+# -----------------------------
+*.log
+
+# -----------------------------
+# Python virtual envs (if used)
+# -----------------------------
+venv/
+.env/
