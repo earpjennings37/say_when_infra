@@ -1,3 +1,4 @@
+/*
 module "eks_east" {
   source  = "terraform-aws-modules/eks/aws"
   providers = { aws = aws }
@@ -27,3 +28,4 @@ module "eks_west" {
     }
   }
 }
+*/
