@@ -11,6 +11,7 @@ resource "helm_release" "argocd_east" {
 }
 
 resource "helm_release" "argocd_west" {
+  count = var.enable_west ? 1 : 0
   provider = helm.west
   name       = "argocd"
   repository = "https://argoproj.github.io/argo-helm"

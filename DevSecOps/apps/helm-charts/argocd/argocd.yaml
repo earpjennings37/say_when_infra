@@ -4,7 +4,8 @@ configs:
 
 server:
   service:
-    type: LoadBalancer
+    type: ClusterIP
+# Access ArgoCD via: kubectl port-forward -n argocd svc/argocd-server 8080:80
 
 controller:
   replicas: 1

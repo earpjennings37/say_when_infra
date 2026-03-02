@@ -19,3 +19,7 @@ variable "cluster_version" {
   type    = string
   default = "1.30"
 }
+variable "enable_west" {
+  type    = bool
+  default = false
+}

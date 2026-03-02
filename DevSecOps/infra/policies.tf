@@ -1,3 +1,4 @@
+/*
 data "aws_iam_policy_document" "s3_backup" {
   statement {
     effect = "Allow"

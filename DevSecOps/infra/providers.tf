@@ -24,7 +24,6 @@ provider "aws" {
     region = var.regions["west"] 
 }
 
-/*
 provider "helm" {
     alias = "east"
   kubernetes {
@@ -33,7 +32,6 @@ provider "helm" {
     token                  = data.aws_eks_cluster_auth.east.token
   }
 }
-
 provider "helm" {
   alias = "west"
   kubernetes {
@@ -42,4 +40,3 @@ provider "helm" {
     token                  = data.aws_eks_cluster_auth.west.token
   }
 }
-*/
