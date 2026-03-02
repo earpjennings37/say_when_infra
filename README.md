@@ -5,13 +5,10 @@ https://im-your-huckleberry.com/
 
 IF your more of "lemme see the sausage making process", feel free to parooze in this repo where i post a plethora of code around:
 - AWS
-- Kubernetes
-- Helm Charts
-- Prometheus
-- Grafana
-- AI/ML
-- ArgoCD
-- Docker
+- Ai/ML
+- CICD Tooling
+- IaC
+- Orchestration & Monitoring
 
 I know what your thinking, what actually will this repo & blog do for me when i click it? Well put it like this as a once great 21st century philospher before me once said:
 - Wyatt Earp - "you tell em i'm coming & hells coming w/me!"
