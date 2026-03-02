@@ -16,16 +16,16 @@ terraform {
   }
 }
 provider "aws" {
-    alias = "east"
+  alias  = "east"
   region = var.regions["east"]
 }
 provider "aws" {
-    alias = "west"
-    region = var.regions["west"] 
+  alias  = "west"
+  region = var.regions["west"]
 }
 
 provider "helm" {
-    alias = "east"
+  alias = "east"
   kubernetes {
     host                   = module.eks_east.cluster_endpoint
     cluster_ca_certificate = base64decode(module.eks_east.cluster_certificate_authority_data)
