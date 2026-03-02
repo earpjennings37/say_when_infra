@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/wyatt/say_when.git
-    path: apps/usgw1/argocd
+    path: apps/usge1/argocd
     targetRevision: main
   destination:
     server: https://kubernetes.default.svc

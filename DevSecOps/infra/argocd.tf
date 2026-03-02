@@ -5,6 +5,9 @@ resource "helm_release" "argocd_east" {
   chart      = "argo-cd"
   namespace  = "argocd"
   create_namespace = true
+  values = [
+    file("${path.module}/argocd_values.yaml")
+  ]
 }
 
 resource "helm_release" "argocd_west" {
@@ -14,4 +17,7 @@ resource "helm_release" "argocd_west" {
   chart      = "argo-cd"
   namespace  = "argocd"
   create_namespace = true
+  values = [
+    file("${path.module}/argocd_values.yaml")
+  ]
 }
