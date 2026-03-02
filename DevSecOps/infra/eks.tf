@@ -14,10 +14,12 @@ module "eks_east" {
   eks_managed_node_groups = {
     default = {
       instance_types = [var.node_instance_type]
-      min_size       = var.node_min_size
-      desired_size   = var.node_desired_size
-      max_size       = var.node_max_size
-      capacity_type  = "ON_DEMAND"
+      # REQUIRED for ARM (t4g.*)
+      ami_type      = "AL2023_ARM_64_STANDARD"
+      min_size      = var.node_min_size
+      desired_size  = var.node_desired_size
+      max_size      = var.node_max_size
+      capacity_type = "ON_DEMAND"
     }
   }
 }
@@ -38,10 +40,12 @@ module "eks_west" {
   eks_managed_node_groups = {
     default = {
       instance_types = [var.node_instance_type]
-      min_size       = var.node_min_size
-      desired_size   = var.node_desired_size
-      max_size       = var.node_max_size
-      capacity_type  = "ON_DEMAND"
+      # REQUIRED for ARM (t4g.*)
+      ami_type      = "AL2023_ARM_64_STANDARD"
+      min_size      = var.node_min_size
+      desired_size  = var.node_desired_size
+      max_size      = var.node_max_size
+      capacity_type = "ON_DEMAND"
     }
   }
 }

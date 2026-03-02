@@ -1,52 +1,84 @@
-/*
-variable "service_accounts" {
-  default = {
-    #IRSA Role for S3 Backup
-    name      = "s3-backup"
-    namespace = "backup"
-  }
-}
-*/
+############################################
+# REGION CONFIGURATION
+############################################
+
 variable "regions" {
-  type = map(string)
+  description = "AWS regions for east and west clusters"
+  type        = map(string)
 }
 
 variable "enable_west" {
-  type    = bool
-  default = false
+  description = "Enable or disable the west region infrastructure"
+  type        = bool
+  default     = false
 }
 
+
+############################################
+# VPC CONFIGURATION
+############################################
+
+variable "east_cidr" {
+  description = "CIDR block for the east VPC"
+  type        = string
+}
+
+variable "west_cidr" {
+  description = "CIDR block for the west VPC"
+  type        = string
+}
+
+variable "east_azs" {
+  description = "Availability Zones for the east VPC"
+  type        = list(string)
+}
+
+variable "west_azs" {
+  description = "Availability Zones for the west VPC"
+  type        = list(string)
+}
+
+variable "east_public_subnets" {
+  description = "Public subnets for the east VPC"
+  type        = list(string)
+}
+
+variable "west_public_subnets" {
+  description = "Public subnets for the west VPC"
+  type        = list(string)
+}
+
+
+############################################
+# EKS CONFIGURATION
+############################################
+
 variable "cluster_version" {
-  type    = string
-  default = "1.30"
+  description = "Kubernetes version for the EKS clusters"
+  type        = string
+  default     = "1.30"
 }
 
 variable "node_instance_type" {
-  type    = string
-  default = "t4g.small"
+  description = "Instance type for EKS managed node groups"
+  type        = string
+  default     = "t4g.small"
 }
 
 variable "node_min_size" {
-  type    = number
-  default = 0
+  description = "Minimum number of nodes in the node group"
+  type        = number
+  default     = 0
 }
+
 variable "node_desired_size" {
-  type    = number
-  default = 0
+  description = "Desired number of nodes in the node group"
+  type        = number
+  default     = 0
 }
+
 variable "node_max_size" {
-  type    = number
-  default = 1
-}
-variable "east_azs" {
-  type = list(string)
-}
-variable "west_azs" {
-  type = list(string)
-}
-variable "east_cidr" {
-  type = string
-}
-variable "west_cidr" {
-  type = string
+  description = "Maximum number of nodes in the node group"
+  type        = number
+  default     = 1
 }
