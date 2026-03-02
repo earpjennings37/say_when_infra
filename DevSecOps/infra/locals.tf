@@ -1,3 +1,30 @@
+locals {
+  # ----------------------------------------
+  # West VPC subnets (safe even when disabled)
+  # ----------------------------------------
+  vpc_west_subnets = var.enable_west ? module.vpc_west[0].public_subnets : []
+
+  # ----------------------------------------
+  # West EKS cluster endpoint (safe)
+  # ----------------------------------------
+  eks_west_endpoint = var.enable_west ? module.eks_west[0].cluster_endpoint : ""
+
+  # ----------------------------------------
+  # West EKS cluster CA data (safe)
+  # ----------------------------------------
+  eks_west_ca = var.enable_west ? base64decode(module.eks_west[0].cluster_certificate_authority_data) : ""
+
+  # ----------------------------------------
+  # West EKS auth token (safe)
+  # ----------------------------------------
+  eks_west_token = var.enable_west ? data.aws_eks_cluster_auth.west[0].token : ""
+
+  # ----------------------------------------
+  # Optional: west cluster name (cleaner references)
+  # ----------------------------------------
+  eks_west_name = var.enable_west ? module.eks_west[0].cluster_name : ""
+}
+
 /*
 locals {
   account_id = data.aws_caller_identity.current.account_id

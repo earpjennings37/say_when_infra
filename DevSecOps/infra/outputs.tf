@@ -1,3 +1,6 @@
 output "cluster_name" {
-  value = module.eks.cluster_name
+  value = module.eks_east.cluster_name
+}
+output "eks_west_cluster_name" {
+  value = var.enable_west ? module.eks_west[0].cluster_name : null
 }
