@@ -12,11 +12,13 @@ provider "helm" {
 ##############################
 # HELM PROVIDER — WEST (optional)
 ##############################
-provider "helm" {
-  alias = "west"
+provider "helm" "west" {
+  count = var.enable_west ? 1 : 0
+
   kubernetes {
-    host                   = local.eks_west_endpoint
-    cluster_ca_certificate = local.eks_west_ca
-    token                  = local.eks_west_token
+    host                   = module.eks_west[0].cluster_endpoint
+    cluster_ca_certificate = base64decode(module.eks_west[0].cluster_certificate_authority_data)
+    token                  = data.aws_eks_cluster_auth.west[0].token
   }
 }
+
