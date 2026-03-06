@@ -1,36 +1,64 @@
-# -----------------------------
+# ----------------------------------------
 # Terraform
-# -----------------------------
+# ----------------------------------------
+.terraform/
 *.tfstate
 *.tfstate.*
-.terraform/
-.terraform.lock.hcl
+crash.log
+crash.*.log
 
-# Local variable files (never commit secrets)
+# Terraform plans
+*.tfplan
+*.plan
+
+# Local-only variable files (never commit secrets)
 *.tfvars
 *.tfvars.json
+*.auto.tfvars
+*.auto.tfvars.json
+terraform.tfvars
+terraform.tfvars.json
 *state.config
 
-# Crash logs
-crash.log
+# Terraform override files (local only)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
 
-# -----------------------------
+# Terraform CLI config
+.terraformrc
+terraform.rc
+
+# Commit this for reproducible provider versions
+# (HCP Terraform expects it)
+# DO NOT ignore:
+# .terraform.lock.hcl
+
+# ----------------------------------------
 # Kubernetes / kubeconfig
-# -----------------------------
+# ----------------------------------------
 *.kubeconfig
 kubeconfig
 kubeconfig-*
 
-# -----------------------------
+# ----------------------------------------
 # Helm
-# -----------------------------
-# Helm cache and local chart builds
+# ----------------------------------------
 charts/
 *.tgz
 
-# -----------------------------
+# ----------------------------------------
+# Logs
+# ----------------------------------------
+*.log
+*.tmp
+*.bak
+*.swp
+
+# ----------------------------------------
 # OS / Editor junk
-# -----------------------------
+# ----------------------------------------
 .DS_Store
 Thumbs.db
 
@@ -41,13 +69,8 @@ Thumbs.db
 # JetBrains
 .idea/
 
-# -----------------------------
-# Logs
-# -----------------------------
-*.log
-
-# -----------------------------
+# ----------------------------------------
 # Python virtual envs (if used)
-# -----------------------------
+# ----------------------------------------
 venv/
 .env/
