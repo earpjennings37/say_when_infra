@@ -31,11 +31,11 @@ provider "helm" {
 ##############################
 provider "helm" {
   alias = "west"
-  count = var.enable_west ? 1 : 0
+
   kubernetes {
-    host                   = module.eks_west.cluster_endpoint
-    cluster_ca_certificate = base64decode(module.eks_west.cluster_certificate_authority_data)
-    token                  = data.aws_eks_cluster_auth.west[0].token
+    host                   = var.enable_west ? module.eks_west[0].cluster_endpoint : ""
+    cluster_ca_certificate = var.enable_west ? base64decode(module.eks_west[0].cluster_certificate_authority_data) : ""
+    token                  = var.enable_west ? data.aws_eks_cluster_auth.west[0].token : ""
   }
 }
 ##############################
