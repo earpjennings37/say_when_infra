@@ -82,3 +82,8 @@ variable "node_max_size" {
   type        = number
   default     = 1
 }
+
+variable "bucket_name" {
+  description = "Name of the Thanos S3 bucket"
+  type        = string
+}

@@ -9,9 +9,17 @@ data "aws_iam_policy_document" "thanos_irsa_assume" {
 
     condition {
       test     = "StringEquals"
+      variable = "${aws_iam_openid_connect_provider.eks.url}:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
       variable = "${aws_iam_openid_connect_provider.eks.url}:sub"
-      values   = [
-        "system:serviceaccount:monitoring:prometheus-kube-prometheus-prometheus"
+      values = [
+        "system:serviceaccount:monitoring:prometheus-kube-prometheus-prometheus",
+        "system:serviceaccount:monitoring:thanos-compactor",
+        "system:serviceaccount:monitoring:thanos-storegateway"
       ]
     }
   }
