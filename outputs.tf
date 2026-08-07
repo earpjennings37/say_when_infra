@@ -13,6 +13,7 @@ output "cluster_oidc_provider_arn" {
   description = "OIDC provider ARN for IRSA"
   value       = module.eks_east.oidc_provider_arn
 }
+/*
 ###################
 # KUBECONFIG
 ###################
@@ -21,6 +22,8 @@ output "kubeconfig" {
   value       = module.eks_east.kubeconfig
   sensitive   = true
 }
+*/
+
 ###########
 # ARGOCD
 ###########

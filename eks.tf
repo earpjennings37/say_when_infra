@@ -20,7 +20,7 @@ module "eks_east" {
       desired_size  = var.node_desired_size
       max_size      = var.node_max_size
       capacity_type = "ON_DEMAND"
-      tags = local.tags
+      tags          = local.tags
     }
   }
   tags = local.tags
@@ -48,7 +48,7 @@ module "eks_west" {
       desired_size  = var.node_desired_size
       max_size      = var.node_max_size
       capacity_type = "ON_DEMAND"
-      tags = local.tags
+      tags          = local.tags
     }
     tags = local.tags
   }
