@@ -1,6 +1,9 @@
 configs:
   params:
     server.insecure: true
+  cm:
+    applicationSet:
+      enableNewGenerators: "true"
 
 server:
   enabled: true
@@ -19,9 +22,10 @@ repoServer:
   replicas: 1
 
 installCRDs: true
+
 applicationSet:
-  replicas: 1
   enabled: true
+  replicas: 1
 
 dex:
   enabled: false
