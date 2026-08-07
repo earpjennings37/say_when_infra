@@ -3,9 +3,14 @@ configs:
     server.insecure: true
 
 server:
+  enabled: true
+  insecure: true
   service:
     type: ClusterIP
-# Access ArgoCD via: kubectl port-forward -n argocd svc/argocd-server 8080:80
+    ports:
+      - name: http
+        port: 80
+        targetPort: 8080
 
 controller:
   replicas: 1
@@ -13,8 +18,10 @@ controller:
 repoServer:
   replicas: 1
 
+installCRDs: true
 applicationSet:
   replicas: 1
+  enabled: true
 
 dex:
   enabled: false
