@@ -4,6 +4,8 @@ configs:
   cm:
     applicationSet:
       enableNewGenerators: "true"
+  secret:
+    server.secretkey: "<hex-key>"
 
 server:
   enabled: true
