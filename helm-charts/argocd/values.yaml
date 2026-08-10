@@ -14,21 +14,56 @@ server:
       - name: http
         port: 80
         targetPort: 8080
+  resources:
+    requests:
+      cpu: 20m
+      memory: 50Mi
+    limits:
+      cpu: 100m
+      memory: 100Mi
 
 controller:
   replicas: 1
+  resources:
+    requests:
+      cpu: 20m
+      memory: 50Mi
+    limits:
+      cpu: 100m
+      memory: 100Mi
 
 repoServer:
   replicas: 1
+  resources:
+    requests:
+      cpu: 20m
+      memory: 50Mi
+    limits:
+      cpu: 100m
+      memory: 100Mi
 
 installCRDs: true
 
 applicationSet:
   enabled: true
   replicas: 1
+  resources:
+    requests:
+      cpu: 10m
+      memory: 30Mi
+    limits:
+      cpu: 50m
+      memory: 50Mi
 
 dex:
   enabled: false
 
 redis:
   enabled: true
+  resources:
+    requests:
+      cpu: 10m
+      memory: 30Mi
+    limits:
+      cpu: 50m
+      memory: 50Mi
