@@ -55,6 +55,7 @@ applicationSet:
       cpu: 50m
       memory: 50Mi
 
+
 dex:
   enabled: false
 
