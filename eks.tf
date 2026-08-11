@@ -53,6 +53,6 @@ module "eks_west" {
       capacity_type = "SPOT"
       tags          = local.tags
     }
-    tags = local.tags
   }
+  tags = local.tags
 }
