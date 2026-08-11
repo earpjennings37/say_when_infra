@@ -38,11 +38,11 @@ repoServer:
   replicas: 1
   resources:
     requests:
-      cpu: 20m
-      memory: 50Mi
+      cpu: 200m
+      memory: 1Gi
     limits:
-      cpu: 100m
-      memory: 100Mi
+      cpu: 500m
+      memory: 2Gi
 
 installCRDs: true
 
