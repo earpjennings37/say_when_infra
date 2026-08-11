@@ -62,7 +62,7 @@ variable "cluster_version" {
 variable "node_instance_types" {
   description = "Instance types for EKS managed node groups (SPOT fallback list)"
   type        = list(string)
-  default     = ["t4g.small", "t4g.medium", "t3.small", "t3.medium"]
+  default     =  ["t4g.small", "t4g.medium", "t4g.large"]
 }
 
 variable "node_min_size" {
