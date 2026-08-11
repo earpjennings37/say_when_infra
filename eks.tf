@@ -20,7 +20,10 @@ module "eks_east" {
       desired_size  = var.node_desired_size
       max_size      = var.node_max_size
       capacity_type = "SPOT"
-      tags          = local.tags
+      tags = merge(
+        local.tags,
+        { force_update = "true" }
+      )
     }
   }
   tags = local.tags
