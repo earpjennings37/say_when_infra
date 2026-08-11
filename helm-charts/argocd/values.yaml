@@ -70,3 +70,5 @@ redis:
     limits:
       cpu: 50m
       memory: 50Mi
+
+additionalProjects: []
