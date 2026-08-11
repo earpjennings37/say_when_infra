@@ -13,9 +13,7 @@ server:
   service:
     type: ClusterIP
     ports:
-      - name: http
-        port: 80
-        targetPort: 8080
+      http: 80
   resources:
     requests:
       cpu: 20m
@@ -56,7 +54,6 @@ applicationSet:
     limits:
       cpu: 50m
       memory: 50Mi
-
 
 dex:
   enabled: false
