@@ -13,7 +13,7 @@ module "eks_east" {
   cluster_enabled_log_types      = []
   eks_managed_node_groups = {
     default = {
-      instance_types = [var.node_instance_type]
+      instance_types = var.node_instance_types
       # REQUIRED for ARM (t4g.*)
       ami_type      = "AL2023_ARM_64_STANDARD"
       min_size      = var.node_min_size
@@ -44,7 +44,7 @@ module "eks_west" {
   cluster_enabled_log_types      = []
   eks_managed_node_groups = {
     default = {
-      instance_types = [var.node_instance_type]
+      instance_types = var.node_instance_types
       # REQUIRED for ARM (t4g.*)
       ami_type      = "AL2023_ARM_64_STANDARD"
       min_size      = var.node_min_size
