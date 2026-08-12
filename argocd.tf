@@ -7,7 +7,7 @@ resource "helm_release" "argocd_east" {
   namespace        = "argocd"
   repository       = "https://argoproj.github.io/argo-helm"
   chart            = "argo-cd"
-  version          = "7.1.0"
+  version          = "7.3.6"
   create_namespace = true
   timeout = 600
   wait    = false
@@ -25,7 +25,7 @@ resource "helm_release" "argocd_west" {
   namespace        = "argocd"
   repository       = "https://argoproj.github.io/argo-helm"
   chart            = "argo-cd"
-  version          = "7.1.0"
+  version          = "7.3.6"
   create_namespace = true
   values = [
     file("${path.module}/helm-charts/argocd/values.yaml")
