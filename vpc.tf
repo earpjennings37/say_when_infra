@@ -25,14 +25,8 @@ module "vpc_east" {
 }
 
 # ⭐ FREE outbound internet for EAST
-resource "aws_route" "east_public_internet_access_1" {
+resource "aws_route" "east_public_internet_access" {
   route_table_id         = module.vpc_east.public_route_table_ids[0]
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = module.vpc_east.igw_id
-}
-
-resource "aws_route" "east_public_internet_access_2" {
-  route_table_id         = module.vpc_east.public_route_table_ids[1]
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = module.vpc_east.igw_id
 }
@@ -65,16 +59,9 @@ module "vpc_west" {
 }
 
 # ⭐ FREE outbound internet for WEST (only created if west is enabled)
-resource "aws_route" "west_public_internet_access_1" {
+resource "aws_route" "west_public_internet_access" {
   count                  = var.enable_west ? 1 : 0
   route_table_id         = module.vpc_west[0].public_route_table_ids[0]
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = module.vpc_west[0].igw_id
-}
-
-resource "aws_route" "west_public_internet_access_2" {
-  count                  = var.enable_west ? 1 : 0
-  route_table_id         = module.vpc_west[0].public_route_table_ids[1]
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = module.vpc_west[0].igw_id
 }
