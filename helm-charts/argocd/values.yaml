@@ -7,6 +7,13 @@ configs:
   secret:
     server.secretkey: "<hex-key>"
 
+  repositories:
+    bitnami-oci:
+      name: bitnami-oci
+      type: helm
+      url: registry-1.docker.io/bitnamicharts
+      enableOCI: "true"
+
 server:
   enabled: true
   insecure: true
