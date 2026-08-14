@@ -10,62 +10,100 @@ configs:
 server:
   enabled: true
   insecure: true
+
   service:
     type: ClusterIP
     ports:
       http: 80
+
   resources:
     requests:
       cpu: 20m
-      memory: 50Mi
+      memory: 64Mi
     limits:
       cpu: 100m
-      memory: 100Mi
+      memory: 128Mi
+
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: argocd-server
 
 controller:
   replicas: 1
+
   resources:
     requests:
       cpu: 100m
-      memory: 512Mi
+      memory: 384Mi
     limits:
       cpu: 500m
-      memory: 1Gi
+      memory: 768Mi
+
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: argocd-application-controller
 
 repoServer:
   replicas: 1
+
   resources:
     requests:
-      cpu: 100m
-      memory: 512Mi
+      cpu: 50m
+      memory: 160Mi
     limits:
       cpu: 300m
-      memory: 1Gi
+      memory: 384Mi
+
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: argocd-repo-server
 
 installCRDs: true
 
 applicationSet:
   enabled: true
   replicas: 1
+
   resources:
     requests:
       cpu: 10m
-      memory: 30Mi
+      memory: 32Mi
     limits:
       cpu: 50m
-      memory: 50Mi
+      memory: 64Mi
+
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: argocd-applicationset-controller
 
 dex:
   enabled: false
 
 redis:
   enabled: true
+
   resources:
     requests:
       cpu: 10m
-      memory: 30Mi
+      memory: 32Mi
     limits:
       cpu: 50m
-      memory: 50Mi
+      memory: 64Mi
 
 additionalProjects: []
