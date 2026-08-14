@@ -11,6 +11,8 @@ module "eks_east" {
   subnet_ids                     = module.vpc_east.public_subnets
   cluster_endpoint_public_access = true
   cluster_enabled_log_types      = []
+
+  enable_irsa = true
   eks_managed_node_groups = {
     default = {
       instance_types = var.node_instance_types
