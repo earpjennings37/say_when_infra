@@ -40,19 +40,3 @@ provider "kubectl" {
   token                  = data.aws_eks_cluster_auth.east.token
   cluster_ca_certificate = base64decode(module.eks_east.cluster_certificate_authority_data)
 }
-
-##############################
-# EAST AUTH
-##############################
-data "aws_eks_cluster_auth" "east" {
-  provider = aws.east
-  name     = module.eks_east.cluster_name
-}
-##############################
-# WEST AUTH (optional)
-##############################
-data "aws_eks_cluster_auth" "west" {
-  provider = aws.west
-  count    = var.enable_west ? 1 : 0
-  name     = local.eks_west_name
-}
