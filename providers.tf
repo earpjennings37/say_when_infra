@@ -10,7 +10,7 @@ terraform {
       version = "~> 2.0"
     }
     kubectl = {
-      source = "hashicorp-oss/kubectl"
+      source  = "hashicorp-oss/kubectl"
       version = "~> 0.1"
     }
   }
@@ -36,8 +36,8 @@ provider "kubectl" {
   load_config_file = false
 
   # Or specify explicit cluster connection details
-  host = module.eks_east.cluster_endpoint
-  token = data.aws_eks_cluster_auth.east.token
+  host                   = module.eks_east.cluster_endpoint
+  token                  = data.aws_eks_cluster_auth.east.token
   cluster_ca_certificate = base64decode(module.eks_east.cluster_certificate_authority_data)
 }
 
