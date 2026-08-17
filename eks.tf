@@ -13,21 +13,37 @@ module "eks_east" {
   cluster_enabled_log_types      = []
 
   enable_irsa = true
+
   eks_managed_node_groups = {
     default = {
       instance_types = var.node_instance_types
-      # REQUIRED for ARM (t4g.*)
-      ami_type      = "AL2023_ARM_64_STANDARD"
-      min_size      = var.node_min_size
-      desired_size  = var.node_desired_size
-      max_size      = var.node_max_size
-      capacity_type = "SPOT"
+      ami_type       = "AL2023_ARM_64_STANDARD"
+      min_size       = var.node_min_size
+      desired_size   = var.node_desired_size
+      max_size       = var.node_max_size
+      capacity_type  = "SPOT"
+
       tags = merge(
         local.tags,
         { force_update = "true" }
       )
     }
+
+    prefix = {
+      instance_types = var.node_instance_types
+      ami_type       = "AL2023_ARM_64_STANDARD"
+      min_size       = var.node_min_size
+      desired_size   = var.node_desired_size
+      max_size       = var.node_max_size
+      capacity_type  = "SPOT"
+
+      tags = merge(
+        local.tags,
+        { prefix_delegation = "true" }
+      )
+    }
   }
+
   tags = local.tags
 }
 ##############################
