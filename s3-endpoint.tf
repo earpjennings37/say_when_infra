@@ -13,3 +13,20 @@ resource "aws_vpc_endpoint" "s3_east" {
     }
   )
 }
+
+resource "aws_vpc_endpoint_policy" "s3_east" {
+  vpc_endpoint_id = aws_vpc_endpoint.s3_east.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "*"
+        Resource  = "*"
+      }
+    ]
+  })
+}
