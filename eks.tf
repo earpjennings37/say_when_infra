@@ -14,6 +14,22 @@ module "eks_east" {
 
   enable_irsa = true
 
+  cluster_addons = {
+    vpc-cni = {
+      most_recent    = true
+      before_compute = true
+
+      configuration_values = jsonencode({
+        enableNetworkPolicy = "true"
+
+        env = {
+          ENABLE_PREFIX_DELEGATION = "true"
+          WARM_PREFIX_TARGET       = "1"
+        }
+      })
+    }
+  }
+
   eks_managed_node_groups = {
     prefix = {
       instance_types = var.node_instance_types
