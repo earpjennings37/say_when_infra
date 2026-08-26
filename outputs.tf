@@ -38,6 +38,13 @@ output "grafana_service" {
   description = "Internal DNS name for Grafana"
   value       = "kube-prometheus-stack-grafana.monitoring.svc.cluster.local"
 }
+##################
+# POPEYE
+##################
+
+output "popeye_ecr_repository_url" {
+  value = aws_ecr_repository.popeye.repository_url
+}
 
 /*
 #########################
