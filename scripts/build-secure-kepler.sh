@@ -10,9 +10,6 @@ KEPLER_VERSION="v0.11.4"
 REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 IMAGE="${REGISTRY}/${ECR_REPO}:${KEPLER_VERSION}"
 
-# Persist outside Terraform/ECR so destroy does NOT remove build cache.
-CACHE_DIR="${HOME}/.cache/kepler-buildx"
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 INFRA_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 SBOM_DIR="${INFRA_ROOT}/artifacts/sbom"
@@ -43,20 +40,6 @@ aws ecr get-login-password --region "${AWS_REGION}" \
       --password-stdin \
       "${REGISTRY}"
 
-# If image already exists in ECR, don't rebuild it.
-if aws ecr describe-images \
-  --region "${AWS_REGION}" \
-  --repository-name "${ECR_REPO}" \
-  --image-ids imageTag="${KEPLER_VERSION}" \
-  >/dev/null 2>&1; then
-
-  echo
-  echo "Kepler image already exists in ECR:"
-  echo "${IMAGE}"
-  echo "Skipping Docker build."
-  exit 0
-fi
-
 WORKDIR="$(mktemp -d)"
 trap 'rm -rf "${WORKDIR}"' EXIT
 
@@ -70,27 +53,18 @@ git clone \
 cd "${WORKDIR}/kepler"
 
 GIT_COMMIT="$(git rev-parse HEAD)"
-
-# IMPORTANT:
-# Use the Git commit timestamp instead of "date now".
-# This stays identical for the same Kepler version and allows Docker
-# to reuse the expensive Go compilation layer.
 BUILD_TIME="$(git show -s --format=%cI HEAD)"
 
-mkdir -p "${CACHE_DIR}"
 mkdir -p "${SBOM_DIR}"
 
 echo
 echo "Building ARM64 Kepler image..."
 echo "Image: ${IMAGE}"
-echo "Build cache: ${CACHE_DIR}"
 echo
 
 docker buildx build \
   --progress=plain \
   --platform linux/arm64 \
-  --cache-from "type=local,src=${CACHE_DIR}" \
-  --cache-to "type=local,dest=${CACHE_DIR},mode=max" \
   --build-arg VERSION="${KEPLER_VERSION}" \
   --build-arg GIT_COMMIT="${GIT_COMMIT}" \
   --build-arg GIT_BRANCH="${KEPLER_VERSION}" \
@@ -100,7 +74,7 @@ docker buildx build \
   .
 
 echo
-echo "Verifying image architecture..."
+echo "Verifying image..."
 docker buildx imagetools inspect "${IMAGE}"
 
 echo
