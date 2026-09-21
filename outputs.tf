@@ -126,3 +126,11 @@ output "tempo_service" {
   value       = "tempo.monitoring.svc.cluster.local"
 }
 */
+
+##################
+# K8sGPT
+##################
+output "k8sgpt_bedrock_role_arn" {
+  description = "IRSA role used by the K8sGPT Bedrock workload"
+  value       = aws_iam_role.k8sgpt_irsa.arn
+}
