@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "k8sgpt_irsa_assume" {
       variable = "${replace(module.eks_east.cluster_oidc_issuer_url, "https://", "")}:sub"
 
       values = [
-        "system:serviceaccount:k8sgpt-operator-system:k8sgpt-bedrock"
+        "system:serviceaccount:k8sgpt-operator-system:k8sgpt-k8sgpt-operator-system"
       ]
     }
   }
