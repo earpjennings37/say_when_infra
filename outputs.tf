@@ -134,3 +134,16 @@ output "k8sgpt_bedrock_role_arn" {
   description = "IRSA role used by the K8sGPT Bedrock workload"
   value       = aws_iam_role.k8sgpt_irsa.arn
 }
+
+##################
+# External Secrets
+##################
+output "external_secrets_role_arn" {
+  description = "IAM role used by External Secrets Operator through EKS Pod Identity"
+  value       = aws_iam_role.external_secrets.arn
+}
+
+output "demo_secrets_manager_secret_name" {
+  description = "Name of the temporary demo secret in AWS Secrets Manager"
+  value       = aws_secretsmanager_secret.demo_app.name
+}
