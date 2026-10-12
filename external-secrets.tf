@@ -16,12 +16,16 @@ locals {
 # ------------------------------------------------------------
 
 data "aws_eks_addon_version" "pod_identity_agent_east" {
+  provider = aws.east
+
   addon_name         = "eks-pod-identity-agent"
   kubernetes_version = module.eks_east.cluster_version
   most_recent        = true
 }
 
 resource "aws_eks_addon" "pod_identity_agent_east" {
+  provider = aws.east
+
   cluster_name  = module.eks_east.cluster_name
   addon_name    = "eks-pod-identity-agent"
   addon_version = data.aws_eks_addon_version.pod_identity_agent_east.version
@@ -50,12 +54,13 @@ ephemeral "random_password" "demo_app" {
 }
 
 resource "aws_secretsmanager_secret" "demo_app" {
+  provider = aws.east
+
   name        = local.demo_secret_name
   description = "Temporary demo application credentials for External Secrets Operator"
 
-  # Immediately and permanently delete during terraform destroy.
-  # This prevents the secret from remaining billable while the
-  # EKS environment is destroyed.
+  # Permanently delete the secret during terraform destroy.
+  # This prevents ongoing charges while the lab is destroyed.
   recovery_window_in_days = 0
 
   tags = {
@@ -66,6 +71,8 @@ resource "aws_secretsmanager_secret" "demo_app" {
 }
 
 resource "aws_secretsmanager_secret_version" "demo_app" {
+  provider = aws.east
+
   secret_id = aws_secretsmanager_secret.demo_app.id
 
   secret_string_wo = jsonencode({
@@ -73,8 +80,7 @@ resource "aws_secretsmanager_secret_version" "demo_app" {
     password = ephemeral.random_password.demo_app.result
   })
 
-  # Increment this number when you intentionally want Terraform
-  # to write a new version of the secret.
+  # Increment this value when intentionally rotating the secret.
   secret_string_wo_version = 1
 }
 
@@ -84,6 +90,8 @@ resource "aws_secretsmanager_secret_version" "demo_app" {
 # ------------------------------------------------------------
 
 data "aws_iam_policy_document" "external_secrets_pod_identity_assume" {
+  provider = aws.east
+
   statement {
     sid    = "AllowEksPodIdentity"
     effect = "Allow"
@@ -101,7 +109,10 @@ data "aws_iam_policy_document" "external_secrets_pod_identity_assume" {
 }
 
 resource "aws_iam_role" "external_secrets" {
-  name               = "external-secrets-pod-identity-role"
+  provider = aws.east
+
+  name = "external-secrets-pod-identity-role"
+
   assume_role_policy = data.aws_iam_policy_document.external_secrets_pod_identity_assume.json
 
   tags = {
@@ -116,6 +127,8 @@ resource "aws_iam_role" "external_secrets" {
 # ------------------------------------------------------------
 
 data "aws_iam_policy_document" "external_secrets" {
+  provider = aws.east
+
   statement {
     sid    = "ReadDemoApplicationSecret"
     effect = "Allow"
@@ -132,16 +145,21 @@ data "aws_iam_policy_document" "external_secrets" {
 }
 
 resource "aws_iam_policy" "external_secrets" {
+  provider = aws.east
+
   name        = "external-secrets-demo-secret-read"
   description = "Allows External Secrets Operator to read only the demo application secret"
   policy      = data.aws_iam_policy_document.external_secrets.json
 
   tags = {
+    Name      = "external-secrets-demo-secret-read"
     ManagedBy = "Terraform"
   }
 }
 
 resource "aws_iam_role_policy_attachment" "external_secrets" {
+  provider = aws.east
+
   role       = aws_iam_role.external_secrets.name
   policy_arn = aws_iam_policy.external_secrets.arn
 }
@@ -152,6 +170,8 @@ resource "aws_iam_role_policy_attachment" "external_secrets" {
 # ------------------------------------------------------------
 
 resource "aws_eks_pod_identity_association" "external_secrets" {
+  provider = aws.east
+
   cluster_name    = module.eks_east.cluster_name
   namespace       = local.external_secrets_namespace
   service_account = local.external_secrets_service_account
