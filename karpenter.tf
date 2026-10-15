@@ -86,3 +86,23 @@ resource "aws_iam_instance_profile" "karpenter_nodes" {
     }
   )
 }
+
+resource "aws_iam_role_policy" "karpenter_instance_profile_gc" {
+  provider = aws.east
+
+  name = "KarpenterInstanceProfileGarbageCollection"
+  role = module.karpenter_east.iam_role_name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Sid      = "AllowListingInstanceProfiles"
+        Effect   = "Allow"
+        Action   = "iam:ListInstanceProfiles"
+        Resource = "*"
+      }
+    ]
+  })
+}
