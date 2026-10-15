@@ -147,3 +147,27 @@ output "demo_secrets_manager_secret_name" {
   description = "Name of the temporary demo secret in AWS Secrets Manager"
   value       = aws_secretsmanager_secret.demo_app.name
 }
+
+# ============================================================
+# Karpenter
+# ============================================================
+
+output "karpenter_controller_role_arn" {
+  description = "IAM role assumed by the Karpenter controller through EKS Pod Identity"
+  value       = module.karpenter_east.iam_role_arn
+}
+
+output "karpenter_node_role_arn" {
+  description = "Existing EKS managed node role reused by Karpenter nodes"
+  value       = module.karpenter_east.node_iam_role_arn
+}
+
+output "karpenter_node_instance_profile_name" {
+  description = "Stable IAM instance profile used by Karpenter EC2 nodes"
+  value       = aws_iam_instance_profile.karpenter_nodes.name
+}
+
+output "karpenter_interruption_queue_name" {
+  description = "SQS queue consumed by Karpenter for interruption events"
+  value       = module.karpenter_east.queue_name
+}

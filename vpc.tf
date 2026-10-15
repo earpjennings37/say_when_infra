@@ -16,6 +16,11 @@ module "vpc_east" {
     "10.0.2.0/24"
   ]
 
+  # Allows the Karpenter EC2NodeClass to discover both east subnets.
+  public_subnet_tags = {
+    "karpenter.sh/discovery" = local.eks_east_name
+  }
+
   enable_nat_gateway = false
   single_nat_gateway = false
 

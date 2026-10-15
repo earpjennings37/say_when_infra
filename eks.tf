@@ -14,6 +14,10 @@ module "eks_east" {
 
   enable_irsa = true
 
+  node_security_group_tags = {
+    "karpenter.sh/discovery" = local.eks_east_name
+  }
+
   cluster_addons = {
     vpc-cni = {
       most_recent    = true
