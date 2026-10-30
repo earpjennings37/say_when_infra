@@ -7,6 +7,7 @@ on:
       - "**/*.tf"
       - ".terraform.lock.hcl"
       - ".terraform-version"
+      - ".tflint.hcl"
       - ".github/workflows/terraform-validate.yaml"
 
   push:
@@ -16,6 +17,7 @@ on:
       - "**/*.tf"
       - ".terraform.lock.hcl"
       - ".terraform-version"
+      - ".tflint.hcl"
       - ".github/workflows/terraform-validate.yaml"
 
   workflow_dispatch:
@@ -58,3 +60,30 @@ jobs:
 
       - name: Validate Terraform configuration
         run: terraform validate -no-color
+
+  tflint:
+    name: TFLint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Install TFLint
+        uses: terraform-linters/setup-tflint@ae78205cfffec9e8d93fd2b3115c7e9d3166d4b6 # v5.0.0
+        with:
+          tflint_version: v0.59.1
+
+      - name: Display TFLint version
+        run: tflint --version
+
+      - name: Initialize TFLint plugins
+        run: tflint --init
+
+      - name: Run TFLint
+        run: |
+          tflint \
+            --recursive \
+            --format=compact \
+            --minimum-failure-severity=error
