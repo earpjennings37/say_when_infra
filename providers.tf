@@ -1,4 +1,12 @@
 terraform {
+  cloud {
+    organization = "MyBlogJourney24"
+
+    workspaces {
+      name = "say_when_infra"
+    }
+  }
+
   required_version = ">= 1.11.0"
 
   required_providers {
@@ -49,6 +57,7 @@ provider "kubectl" {
 
   host  = module.eks_east.cluster_endpoint
   token = data.aws_eks_cluster_auth.east.token
+
   cluster_ca_certificate = base64decode(
     module.eks_east.cluster_certificate_authority_data
   )
