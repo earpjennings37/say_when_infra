@@ -23,12 +23,13 @@ module "eks_east" {
   # compatibility with the existing aws-auth ConfigMap.
   authentication_mode = "API_AND_CONFIG_MAP"
 
-  # Preserve administrator access for the HCP Terraform role
-  # that creates and manages the EKS cluster.
+  # Do not create another cluster-creator access entry.
+  # Access is granted explicitly to the IAM Identity Center
+  # administrator role below.
   enable_cluster_creator_admin_permissions = false
 
-  # Grant the IAM Identity Center administrator role access
-  # to the Kubernetes API.
+  # Grant the IAM Identity Center administrator role
+  # cluster-wide Kubernetes administrator access.
   access_entries = {
     identity_center_admin = {
       principal_arn = var.eks_admin_principal_arn
@@ -45,7 +46,7 @@ module "eks_east" {
     }
   }
 
-  # Used by Karpenter to discover the node security group.
+  # Allow Karpenter to discover the node security group.
   node_security_group_tags = {
     "karpenter.sh/discovery" = local.eks_east_name
   }
