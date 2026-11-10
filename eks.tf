@@ -25,7 +25,7 @@ module "eks_east" {
 
   # Preserve administrator access for the HCP Terraform role
   # that creates and manages the EKS cluster.
-  enable_cluster_creator_admin_permissions = true
+  enable_cluster_creator_admin_permissions = false
 
   # Grant the IAM Identity Center administrator role access
   # to the Kubernetes API.
