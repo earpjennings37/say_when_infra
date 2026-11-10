@@ -87,3 +87,21 @@ variable "bucket_name" {
   description = "Name of the Thanos S3 bucket"
   type        = string
 }
+
+############################################
+# EKS ACCESS CONFIGURATION
+############################################
+
+variable "eks_admin_principal_arn" {
+  description = "IAM Identity Center role ARN granted administrator access to the east EKS cluster"
+  type        = string
+
+  validation {
+    condition = (
+      startswith(var.eks_admin_principal_arn, "arn:aws:iam::") &&
+      strcontains(var.eks_admin_principal_arn, ":role/")
+    )
+
+    error_message = "eks_admin_principal_arn must be a valid IAM role ARN."
+  }
+}
