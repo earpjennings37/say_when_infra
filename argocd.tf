@@ -14,6 +14,10 @@ resource "helm_release" "argocd_east" {
   values = [
     file("${path.module}/helm-charts/argocd/values.yaml")
   ]
+
+  depends_on = [
+    module.eks_east
+  ]
 }
 ########################################
 # Argo CD - WEST (installed only when enabled)

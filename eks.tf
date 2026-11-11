@@ -23,10 +23,10 @@ module "eks_east" {
   # compatibility with the existing aws-auth ConfigMap.
   authentication_mode = "API_AND_CONFIG_MAP"
 
-  # Do not create another cluster-creator access entry.
-  # Access is granted explicitly to the IAM Identity Center
-  # administrator role below.
-  enable_cluster_creator_admin_permissions = false
+  # Grant the HCP Terraform execution role administrator access.
+  # Terraform needs Kubernetes API access to install Argo CD
+  # through the Helm provider after creating the cluster.
+  enable_cluster_creator_admin_permissions = true
 
   # Grant the IAM Identity Center administrator role
   # cluster-wide Kubernetes administrator access.
