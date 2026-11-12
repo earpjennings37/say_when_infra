@@ -12,6 +12,13 @@ This repo builds the AWS side of the lab: networking, the EKS cluster, IAM for t
 
 > In theory it all sounded good. In practice, plenty of steps broke along the way before the downstream pieces worked. Poke around, steal what's useful, and read the blog for the war stories.
 
+Some random quotes to read instead:
+
+- "Iron" Mike Tyson: *"Everyone has a plan until they get punched in the face."*
+- Leslie Chow, *The Hangover*: *"Whatchu talkin' bout, Willis!? Dah him!?"*
+- Pennywise: *"Here, take... it..."*
+- Doc Holliday: *"Say when. I'm your huckleberry."*
+
 ## Architecture
 
 ```mermaid
