@@ -28,26 +28,6 @@ variable "west_cidr" {
   type        = string
 }
 
-variable "east_azs" {
-  description = "Availability Zones for the east VPC"
-  type        = list(string)
-}
-
-variable "west_azs" {
-  description = "Availability Zones for the west VPC"
-  type        = list(string)
-}
-
-variable "east_public_subnets" {
-  description = "Public subnets for the east VPC"
-  type        = list(string)
-}
-
-variable "west_public_subnets" {
-  description = "Public subnets for the west VPC"
-  type        = list(string)
-}
-
 
 ############################################
 # EKS CONFIGURATION
@@ -56,7 +36,7 @@ variable "west_public_subnets" {
 variable "cluster_version" {
   description = "Kubernetes version for the EKS clusters"
   type        = string
-  default     = "1.31"
+  default     = "1.35"
 }
 
 variable "node_instance_types" {

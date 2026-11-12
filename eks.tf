@@ -96,7 +96,7 @@ module "eks_east" {
 module "eks_west" {
   count   = var.enable_west ? 1 : 0
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 19.0"
+  version = "20.37.2"
 
   providers = {
     aws = aws.west
@@ -108,6 +108,10 @@ module "eks_west" {
   subnet_ids                     = module.vpc_west[0].public_subnets
   cluster_endpoint_public_access = true
   cluster_enabled_log_types      = []
+
+  # Module v20 no longer grants the creator admin by default.
+  # Terraform needs it to install Argo CD through the Helm provider.
+  enable_cluster_creator_admin_permissions = true
 
   eks_managed_node_groups = {
     default = {

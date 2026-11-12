@@ -4,8 +4,6 @@ configs:
   cm:
     applicationSet:
       enableNewGenerators: "true"
-  secret:
-    server.secretkey: "<hex-key>"
 
   repositories:
     bitnami-oci:
