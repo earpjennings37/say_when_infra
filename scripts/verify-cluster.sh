@@ -23,6 +23,3 @@ kubectl get pvc -n monitoring
 echo
 echo "=== Node Usage ==="
 kubectl top nodes
-
-chmod +x scripts/verify-cluster.sh
-./scripts/verify-cluster.sh

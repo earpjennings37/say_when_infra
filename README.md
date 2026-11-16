@@ -136,7 +136,7 @@ Set these as **Terraform variables** in the HCP workspace (or in a local `*.auto
 | `bucket_name` | ✅ | a globally unique name for the Thanos bucket |
 | `eks_admin_principal_arn` | ✅ | `arn:aws:iam::<account>:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_AdministratorAccess_<id>` |
 | `enable_west` | | `false` |
-| `cluster_version` | | `"1.31"` (see the cost note below) |
+| `cluster_version` | | `"1.35"` (see the cost note below) |
 | `node_instance_types` | | `["t4g.medium", "c6g.large", "c7g.large"]` |
 | `node_min_size` / `node_desired_size` / `node_max_size` | | `2` / `3` / `3` |
 
@@ -240,7 +240,7 @@ The lab is built to be cheap and disposable:
 
 What still costs money while it's up: the EKS control plane, EC2 Spot nodes, EBS volumes, S3, ECR, Secrets Manager, Bedrock calls and data transfer.
 
-> ⚠️ **Kubernetes version:** EKS charges 6× the normal control-plane rate once a version leaves standard support, and AWS force-upgrades it when extended support ends. Keep `cluster_version` on a version in standard support (the default is `1.31`), and make sure the HCP workspace isn't overriding it with an older one. A running cluster can only move up **one minor version at a time**. Since this lab gets destroyed between sessions, the easy path is to bump the version and rebuild.
+> ⚠️ **Kubernetes version:** EKS charges 6× the normal control-plane rate once a version leaves standard support, and AWS force-upgrades it when extended support ends. Keep `cluster_version` on a version in standard support (the default is `1.35`), and make sure the HCP workspace isn't overriding it with an older one. A running cluster can only move up **one minor version at a time**. Since this lab gets destroyed between sessions, the easy path is to bump the version and rebuild.
 
 ## Destroy
 
