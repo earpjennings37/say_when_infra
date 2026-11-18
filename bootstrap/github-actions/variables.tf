@@ -21,3 +21,14 @@ variable "ecr_repository_name" {
   type        = string
   default     = "say-when-app"
 }
+variable "github_owner_id" {
+  description = "Numeric GitHub account ID. Immutable: survives renames, never reused."
+  type        = string
+  default     = "177775312"
+}
+
+variable "github_repository_id" {
+  description = "Numeric GitHub repository ID. Immutable."
+  type        = string
+  default     = "1460572719"
+}

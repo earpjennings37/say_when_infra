@@ -2,6 +2,17 @@
 # Applied once, like bootstrap/hcp-terraform. These survive every cluster
 # rebuild, so images and their signatures are not lost on teardown.
 
+# CHANGED: build GitHub's OIDC subject claim, which includes immutable numeric IDs.
+# Format: repo:<owner>@<owner-id>/<repo>@<repo-id>:ref:refs/heads/<branch>
+# Numeric IDs are never reused, so a recreated account or repo with the same
+# name can't inherit this role.
+locals {
+  github_owner = split("/", var.github_repository)[0]
+  github_repo  = split("/", var.github_repository)[1]
+
+  github_oidc_sub = "repo:${local.github_owner}@${var.github_owner_id}/${local.github_repo}@${var.github_repository_id}:ref:refs/heads/${var.github_branch}"
+}
+
 # Trust GitHub Actions' OIDC tokens, so CI uses short-lived AWS
 # credentials instead of stored access keys.
 resource "aws_iam_openid_connect_provider" "github_actions" {
@@ -61,7 +72,7 @@ data "aws_iam_policy_document" "github_actions_trust" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_repository}:ref:refs/heads/${var.github_branch}"]
+      values   = [local.github_oidc_sub] # CHANGED: was "repo:${var.github_repository}:ref:refs/heads/${var.github_branch}"
     }
   }
 }
