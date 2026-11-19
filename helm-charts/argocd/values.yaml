@@ -2,8 +2,6 @@ configs:
   params:
     server.insecure: true
   cm:
-    applicationSet:
-      enableNewGenerators: "true"
 
     # Give child Applications a real health status so sync waves in
     # the app-of-apps (monitoring-root) wait for each wave to become
@@ -32,7 +30,6 @@ configs:
 
 server:
   enabled: true
-  insecure: true
 
   service:
     type: ClusterIP
@@ -93,7 +90,12 @@ repoServer:
         matchLabels:
           app.kubernetes.io/name: argocd-repo-server
 
-installCRDs: true
+# Chart 8+ moved CRD settings under "crds". install: chart manages the
+# Application/AppProject CRDs. keep: they survive a helm uninstall, so a
+# bad release can't delete every Application with them.
+crds:
+  install: true
+  keep: true
 
 applicationSet:
   enabled: true
