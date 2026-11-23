@@ -171,3 +171,11 @@ output "karpenter_interruption_queue_name" {
   description = "SQS queue consumed by Karpenter for interruption events"
   value       = module.karpenter_east.queue_name
 }
+
+# ============================================================
+# Secrets Manager
+# ============================================================
+output "say_when_app_settings_secret_name" {
+  description = "Secrets Manager secret synced into the say-when namespace"
+  value       = aws_secretsmanager_secret.say_when_app_settings.name
+}
