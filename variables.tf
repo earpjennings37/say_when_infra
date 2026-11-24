@@ -40,7 +40,7 @@ variable "cluster_version" {
 }
 
 variable "node_instance_types" {
-  description = "Instance types for EKS managed node groups (SPOT fallback list)"
+  description = "Instance types for the managed (system) node group, tried in order"
   type        = list(string)
   default     = ["t4g.medium", "c6g.large", "c7g.large"]
 }
@@ -66,6 +66,17 @@ variable "node_max_size" {
 variable "bucket_name" {
   description = "Name of the Thanos S3 bucket"
   type        = string
+}
+
+variable "node_capacity_type" {
+  description = "Capacity for the managed (system) node group. ON_DEMAND keeps CoreDNS, Argo CD and the Karpenter controller up when Spot is scarce; Karpenter still adds Spot nodes for workloads."
+  type        = string
+  default     = "ON_DEMAND"
+
+  validation {
+    condition     = contains(["ON_DEMAND", "SPOT"], var.node_capacity_type)
+    error_message = "node_capacity_type must be ON_DEMAND or SPOT."
+  }
 }
 
 ############################################
