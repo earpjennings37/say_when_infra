@@ -74,7 +74,7 @@ module "eks_east" {
       min_size       = var.node_min_size
       desired_size   = var.node_desired_size
       max_size       = var.node_max_size
-      capacity_type  = "SPOT"
+      capacity_type  = var.node_capacity_type
 
       tags = merge(
         local.tags,
@@ -122,7 +122,7 @@ module "eks_west" {
       min_size      = var.node_min_size
       desired_size  = var.node_desired_size
       max_size      = var.node_max_size
-      capacity_type = "SPOT"
+      capacity_type = var.node_capacity_type
 
       tags = local.tags
     }
