@@ -28,15 +28,22 @@ flowchart TD
     HCP --> IAM["IAM<br/>IRSA + Pod Identity"]
     HCP --> S3["S3<br/>Thanos bucket + gateway endpoint"]
     HCP --> ECR["ECR<br/>Popeye ARM64 image"]
-    HCP --> SM["Secrets Manager<br/>demo secret"]
+    HCP --> SM["Secrets Manager<br/>demo secret + app settings"]
     HCP --> KarpAWS["Karpenter AWS side<br/>SQS + EventBridge"]
     HCP --> ArgoCD["Argo CD<br/>(Helm)"]
 
-    EKS --> Nodes["ARM64 Spot<br/>managed node group"]
+    EKS --> Nodes["ARM64 On-Demand<br/>system node group"]
     EKS --> Addons["Add-ons<br/>VPC CNI, EBS CSI, Pod Identity Agent"]
     IAM --> Addons
-    IAM --> Workloads["Thanos, K8sGPT (Bedrock),<br/>External Secrets, Karpenter"]
+    IAM --> Workloads["Thanos, K8sGPT (Bedrock),<br/>External Secrets, Karpenter,<br/>Kyverno (ECR read)"]
     ArgoCD --> GitOps["bootstrap-root app<br/>→ say_when_git_ops/bootstrap"]
+
+    subgraph Bootstrap["One-time bootstraps (own state, survive rebuilds)"]
+        BH["bootstrap/hcp-terraform<br/>OIDC role for HCP Terraform"]
+        BG["bootstrap/github-actions<br/>OIDC role + say-when-app ECR repo"]
+    end
+    BH -.-> HCP
+    BG -.-> AppECR["ECR<br/>say-when-app (signed images)"]
 ```
 
 **Who owns what:** Terraform owns the AWS resources and the first Argo CD install. Everything else in the cluster (monitoring, security tools, Karpenter controller, External Secrets, Envoy Gateway, Rollouts) is owned by GitOps.
@@ -47,28 +54,32 @@ flowchart TD
 | --- | --- | --- |
 | Networking | VPC in `us-east-1` across 2 AZs, public subnets only, internet gateway, **no NAT gateway** (saves money) | `vpc.tf` |
 | EKS | `say-when-east`, public API endpoint, `API_AND_CONFIG_MAP` auth, admin access entry for your IAM Identity Center role | `eks.tf` |
-| Nodes | Managed node group on **ARM64 Spot** (`t4g.medium`, `c6g.large`, `c7g.large`), 2–3 nodes | `eks.tf` |
+| Nodes | Managed "system" node group on **ARM64 On-Demand** (`t4g.medium`, `c6g.large`, `c7g.large`), 2–3 nodes. On-Demand keeps CoreDNS, Argo CD and the Karpenter controller up when Spot is scarce. Karpenter still adds **Spot** nodes for workloads. Set `node_capacity_type = "SPOT"` to go back. | `eks.tf` |
 | Networking add-on | VPC CNI with network policy enforcement and prefix delegation turned on | `eks.tf` |
 | Storage | EBS CSI driver add-on with its own IRSA role | `ebs-csi.tf` |
 | Autoscaling | Karpenter IAM (Pod Identity), Spot interruption queue, stable node instance profile. The controller itself comes from GitOps. | `karpenter.tf` |
 | Secrets | Pod Identity Agent, a demo secret in Secrets Manager, and a read-only role for External Secrets Operator | `external-secrets.tf` |
+| App settings | `say-when/app/settings` secret holding the app's admin token. The token is generated as an **ephemeral** value and written with `secret_string_wo`, so it never lands in state or plan output. External Secrets gets a separate policy to read only this secret. Every rebuild gets a fresh token. | `app-secrets.tf` |
+| Image verification | IAM role + Pod Identity associations so Kyverno's admission and reports controllers can read the `say-when-app` ECR repo (images and Cosign signatures). Read-only, one repo. | `kyverno-ecr.tf` |
 | Metrics storage | S3 bucket for Thanos, blocked from public access, plus an S3 gateway endpoint | `s3.tf`, `s3-endpoint.tf` |
 | Metrics IAM | IRSA role so Thanos can read and write that bucket | `thanos-iam.tf`, `thanos-policy.tf` |
 | AI | IRSA role that lets K8sGPT call Amazon Bedrock (`amazon.nova-lite-v1:0`) | `k8sgpt-iam.tf` |
 | Images | ECR repo for a custom ARM64 Popeye image | `ecr-popeye.tf` |
-| GitOps | Argo CD Helm chart `7.1.0` plus the `bootstrap-root` Application | `argocd.tf`, `bootstrap.tf` |
+| App CI | GitHub Actions OIDC provider, a push role locked to `say_when_app` on `main`, and the `say-when-app` ECR repo (scan on push, untagged images expire after 14 days). Separate state, applied once. | `bootstrap/github-actions/` |
+| GitOps | Argo CD Helm chart `10.18.2` (Argo CD v3.6.2) plus the `bootstrap-root` Application. The repo server gets a 1Gi memory limit, since it was OOMKilled rendering ~30 Helm charts. | `argocd.tf`, `bootstrap.tf`, `helm-charts/argocd/` |
 | Optional west | A second VPC, cluster and Argo CD in another region, off by default (`enable_west = false`) | `vpc.tf`, `eks.tf`, `argocd.tf` |
 
 ## How workloads get AWS access
 
-No static AWS keys anywhere. Pods get short-lived credentials one of two ways:
+No static AWS keys anywhere. Pods get short-lived credentials one of two ways (GitHub Actions in `say_when_app` uses its own OIDC role from `bootstrap/github-actions`):
 
 | Workload | Method | Can do |
 | --- | --- | --- |
 | EBS CSI controller | IRSA | Create and attach EBS volumes |
 | Thanos / Prometheus sidecar | IRSA | Read/write the Thanos S3 bucket |
 | K8sGPT | IRSA | Invoke one Bedrock model |
-| External Secrets Operator | EKS Pod Identity | Read **only** the demo secret |
+| External Secrets Operator | EKS Pod Identity | Read **only** the demo secret and `say-when/app/settings` |
+| Kyverno (admission + reports controllers) | EKS Pod Identity | Read images and signatures in the `say-when-app` ECR repo |
 | Karpenter controller | EKS Pod Identity | Launch/terminate nodes, read the interruption queue |
 
 ## Repository structure
@@ -76,6 +87,7 @@ No static AWS keys anywhere. Pods get short-lived credentials one of two ways:
 ```text
 .
 ├── bootstrap/hcp-terraform/   # One-time: OIDC provider + IAM role for HCP Terraform
+├── bootstrap/github-actions/  # One-time: GitHub OIDC role + say-when-app ECR repo
 ├── helm-charts/argocd/        # Argo CD Helm values
 ├── images/popeye/             # Dockerfile for the ARM64 Popeye image
 ├── scripts/
@@ -85,7 +97,7 @@ No static AWS keys anywhere. Pods get short-lived credentials one of two ways:
 ├── providers.tf               # HCP Terraform backend + AWS/Helm/kubectl providers
 ├── variables.tf / locals.tf / data.tf / outputs.tf
 ├── vpc.tf  eks.tf  ebs-csi.tf  karpenter.tf
-├── external-secrets.tf  k8sgpt-iam.tf
+├── external-secrets.tf  app-secrets.tf  kyverno-ecr.tf  k8sgpt-iam.tf
 ├── s3.tf  s3-endpoint.tf  thanos-iam.tf  thanos-policy.tf  policies.tf
 ├── ecr-popeye.tf
 └── argocd.tf  helm.tf  bootstrap.tf
@@ -124,6 +136,21 @@ In the HCP workspace, set these **environment variables**:
 
 > ⚠️ The bootstrap role has `AdministratorAccess` to keep the lab simple. Narrow it before using this anywhere real.
 
+### 1b. One-time: let `say_when_app` CI push images
+
+`bootstrap/github-actions` creates the GitHub Actions OIDC provider, the `say-when-app` ECR repo and a push role that only `say_when_app` workflows on `main` can assume. It lives in its own state so the repo, its images and their signatures survive every cluster rebuild.
+
+```bash
+cd bootstrap/github-actions
+terraform init
+terraform apply
+terraform output github_actions_role_arn   # set as the AWS_ROLE_ARN variable in say_when_app
+```
+
+The trust policy matches GitHub's **immutable-ID** subject claim (`repo:<owner>@<owner-id>/<repo>@<repo-id>:ref:refs/heads/main`), so a recreated account or repo with the same name can't inherit the role. If you fork this, set `github_repository`, `github_owner_id` and `github_repository_id`.
+
+> Apply this **before** the main workspace: `kyverno-ecr.tf` looks the `say-when-app` repo up by name and the plan fails if it doesn't exist.
+
 ### 2. Set the workspace variables
 
 Set these as **Terraform variables** in the HCP workspace (or in a local `*.auto.tfvars` file, which git ignores):
@@ -139,6 +166,7 @@ Set these as **Terraform variables** in the HCP workspace (or in a local `*.auto
 | `cluster_version` | | `"1.35"` (see the cost note below) |
 | `node_instance_types` | | `["t4g.medium", "c6g.large", "c7g.large"]` |
 | `node_min_size` / `node_desired_size` / `node_max_size` | | `2` / `3` / `3` |
+| `node_capacity_type` | | `"ON_DEMAND"` (or `"SPOT"`) for the system node group |
 
 ### 3. Plan and apply
 
@@ -203,6 +231,7 @@ unset GRAFANA_PASSWORD
 | `cluster_name`, `cluster_endpoint`, `cluster_oidc_provider_arn` | Connecting to the cluster and wiring up IRSA |
 | `k8sgpt_bedrock_role_arn` | Service account annotation for K8sGPT |
 | `external_secrets_role_arn`, `demo_secrets_manager_secret_name` | External Secrets setup |
+| `say_when_app_settings_secret_name` | The app settings secret that GitOps syncs into the `say-when` namespace |
 | `karpenter_*` | Values for the Karpenter Helm chart and `EC2NodeClass` |
 | `popeye_ecr_repository_url` | Where `build-secure-popeye.sh` pushes |
 | `argocd_server_service`, `grafana_service` | In-cluster DNS names |
@@ -230,15 +259,15 @@ SBOMs go to `artifacts/sbom/`, which git ignores.
 
 The lab is built to be cheap and disposable:
 
-- ARM64 Spot nodes, small node group, small volumes
+- ARM64 nodes: a small On-Demand system group, with Karpenter adding Spot for workloads; small volumes
 - No NAT gateway (nodes sit in public subnets instead)
 - S3 gateway endpoint (free) for Thanos traffic
 - ClusterIP services only, no load balancers
 - Short Prometheus retention, minimal replicas
-- The demo secret is deleted right away on destroy (`recovery_window_in_days = 0`)
+- The demo and app settings secrets are deleted right away on destroy (`recovery_window_in_days = 0`)
 - **Tear it all down between sessions**
 
-What still costs money while it's up: the EKS control plane, EC2 Spot nodes, EBS volumes, S3, ECR, Secrets Manager, Bedrock calls and data transfer.
+What still costs money while it's up: the EKS control plane, EC2 nodes (On-Demand system group + Karpenter Spot), EBS volumes, S3, ECR, Secrets Manager, Bedrock calls and data transfer.
 
 > ⚠️ **Kubernetes version:** EKS charges 6× the normal control-plane rate once a version leaves standard support, and AWS force-upgrades it when extended support ends. Keep `cluster_version` on a version in standard support (the default is `1.35`), and make sure the HCP workspace isn't overriding it with an older one. A running cluster can only move up **one minor version at a time**. Since this lab gets destroyed between sessions, the easy path is to bump the version and rebuild.
 
@@ -259,6 +288,12 @@ aws ec2 describe-volumes --region us-east-1 \
 ```
 
 Leftover EBS volumes from deleted PVCs, ECR images and S3 data can outlive the cluster. Clean them up if you don't need them.
+
+`bootstrap/github-actions` is **not** destroyed with the cluster, on purpose: the `say-when-app` images and signatures stay in ECR (untagged ones expire after 14 days).
+
+## Troubleshooting
+
+**Argo CD Helm release fails with 401 / "provide credentials" during plan.** `data.tf` reads the EKS auth token using the cluster name as a plain string (`local.eks_east_name`), not `module.eks_east.cluster_name`. Referencing the module makes Terraform defer the read whenever the cluster has a pending change, so the Helm provider ends up with no token. Keep it a plain string.
 
 ## Security notes
 
